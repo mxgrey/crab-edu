@@ -15,12 +15,21 @@
  *
 */
 
-use bevy::prelude::{
-    Component, Entity, Command, World, StandardMaterial, Mesh, Assets, error,
-    BuildChildren, Mesh3d, MeshMaterial3d,
+use bevy::{
+    prelude::{
+        Component, Entity, Command, World, StandardMaterial, Mesh, Assets, error,
+        BuildChildren, Mesh3d, MeshMaterial3d,
+    },
+    render::mesh::primitives::{Meshable, ConeMeshBuilder, MeshBuilder},
+    math::{
+        primitives::{Cone, Rectangle},
+    }
 };
 
 use crate::{Pen, Stroke};
+
+mod shapes;
+use shapes::*;
 
 #[derive(Debug, Clone)]
 pub struct Crab {
@@ -41,8 +50,8 @@ impl Default for Crab {
 pub struct CrabName(pub String);
 
 pub(crate) struct AddCrab {
-    pen: Entity,
-    crab: Crab,
+    pub(crate) pen: Entity,
+    pub(crate) crab: Crab,
 }
 
 impl Command for AddCrab {
@@ -54,7 +63,7 @@ impl Command for AddCrab {
         if self.crab.show_arrow {
             let mesh = match pen.stroke {
                 Stroke::Volume(diameter) => {
-                    create_volume_arrow(diameter/2.0)
+                    make_cylinder_arrow_mesh(diameter/2.0)
                 }
             };
 
@@ -73,8 +82,4 @@ impl Command for AddCrab {
 
         world.entity_mut(self.pen).insert(CrabName(self.crab.name));
     }
-}
-
-fn create_volume_arrow(radius: f32) -> Mesh {
-
 }

@@ -15,9 +15,13 @@
  *
 */
 
-use bevy::prelude::{App, AppExit, AmbientLight, Color, DefaultPlugins, Commands};
+use bevy::prelude::{
+    App, AmbientLight, DefaultPlugins, Commands, Resource, Entity, Camera3d, Transform,
+    Vec3,
+};
+pub use bevy::prelude::{AppExit, Color};
 
-use crate::{Crab, CrabName, PenCommands, Pen, PenHandle, Schedule, Timeline};
+use crate::{AddCrab, Crab, CrabName, PenCommands, Pen, PenHandle, Schedule, Timeline};
 
 pub struct Sketch {
     pub app: App,
@@ -35,6 +39,12 @@ impl Sketch {
             .init_resource::<Schedule>()
             .init_resource::<Timeline>()
             .add_plugins(DefaultPlugins);
+
+        let main_camera = app.world_mut().spawn((
+            Camera3d::default(),
+            Transform::from_xyz(0., 0., 1.).looking_at(Vec3::ZERO, Vec3::Y),
+        )).id();
+        app.world_mut().insert_resource(MainCamera { entity: main_camera });
 
         Sketch { app }
     }
@@ -64,6 +74,7 @@ pub struct Settings {
 impl Settings {
     pub fn spawn_pen(self, commands: &mut Commands) -> PenHandle {
         let pen = commands.spawn(self.pen).id();
+        commands.queue(AddCrab { pen, crab: self.crab });
 
         PenHandle(pen)
     }
@@ -76,4 +87,9 @@ impl<T: Into<Pen>> From<T> for Settings {
             crab: Default::default(),
         }
     }
+}
+
+#[derive(Resource)]
+struct MainCamera {
+    entity: Entity,
 }
