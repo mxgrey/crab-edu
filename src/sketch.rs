@@ -49,19 +49,16 @@ impl Sketch {
         Sketch { app }
     }
 
-    pub fn spawn_pen(&mut self, pen: impl Into<Settings>) -> PenHandle {
+    pub fn spawn_pen(&mut self, pen: impl Into<Settings>) -> PenCommands {
         let settings: Settings = pen.into();
-        self.command(|commands| settings.spawn_pen(commands))
+        let mut commands = self.app.world_mut().commands();
+        let pen = settings.spawn_pen(&mut commands);
+        PenCommands { pen, commands }
     }
 
     pub fn run(&mut self) -> AppExit {
-        self.app.run()
-    }
-
-    fn command<U>(&mut self, f: impl FnOnce(&mut Commands) -> U) -> U{
-        let u = f(&mut self.app.world_mut().commands());
         self.app.world_mut().flush();
-        u
+        self.app.run()
     }
 }
 

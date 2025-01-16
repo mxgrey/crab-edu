@@ -26,3 +26,5 @@ pub(crate) use schedule::*;
 
 mod sketch;
 pub use sketch::*;
+
+pub use bevy::math::{Vec2, Vec3};

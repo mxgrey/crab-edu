@@ -18,7 +18,7 @@
 use bevy::{
     prelude::{
         Component, Entity, Command, World, StandardMaterial, Mesh, Assets, error,
-        BuildChildren, Mesh3d, MeshMaterial3d,
+        BuildChildren, Mesh3d, MeshMaterial3d, Transform, Visibility,
     },
     render::mesh::primitives::{Meshable, ConeMeshBuilder, MeshBuilder},
     math::{
@@ -60,6 +60,12 @@ impl Command for AddCrab {
             error!("Pen unavailable for crab [{}]", self.crab.name);
             return;
         };
+
+        world.entity_mut(self.pen).insert((
+            Transform::IDENTITY,
+            Visibility::Inherited,
+        ));
+
         if self.crab.show_arrow {
             let mesh = match pen.stroke {
                 Stroke::Volume(diameter) => {
